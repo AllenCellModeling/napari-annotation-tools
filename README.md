@@ -33,7 +33,7 @@ Then start the app. It should start copying over files for you. Once this is don
 
 After the `napari` environment is activated in conda, run the following command in the Teriminal app:
 ```sh
-$ python annotator.py
+$ napari-annotator
 ```
 
 ### Advanced Usage:
@@ -54,7 +54,7 @@ These parameters should be self explanatory. Please change this configuration to
 To run the annotator with a different .json file do:
 
 ```sh
-$ python annotator.py --prefs_path "/path/to/your/file.json"
+$ napari-annotator --prefs_path "/path/to/your/file.json"
 ```
 
 

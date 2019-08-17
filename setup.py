@@ -6,7 +6,7 @@ setuptools.setup(
     author_email="gregj@alleninstitute.org",
     description="Napari annotation tools",
     entry_points={
-        "console_scripts": ["napari_annotator = annotation_tools.bin.napari_annotator"]
+        "console_scripts": ["napari-annotator = annotation_tools.bin.napari_annotator"]
     },
     name="annotation_tools",
     packages=setuptools.find_packages(),
