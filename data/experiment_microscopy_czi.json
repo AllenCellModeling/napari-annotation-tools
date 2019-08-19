@@ -1,0 +1,10 @@
+{
+	"annotator": "user",
+	"data_csv": "./data/napari_images_microscopy_czi.csv",
+	"data_dir_local": null,
+	"save_dir": "./data/annotations",
+	"start_from_last_annotation": 1,
+	"save_if_empty": 0,
+    "os": "linux",
+    "im_loader": "microscopy_czi"
+}

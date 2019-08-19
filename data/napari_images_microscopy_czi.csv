@@ -1,0 +1,4 @@
+file_path,set,probe488,probe561,probe638,save_allen
+/allen/aics/microscopy/Data/RnD_Sandbox/5500000000/ZSD2/40X_zstack/5500000000_40X_20180913_1-Scene-1-P4-B02.czi,annotate,TNNT2,MYL7,MYL2
+/allen/aics/microscopy/Data/RnD_Sandbox/5500000035/ZSD3/40X_zstack/5500000035_40X_20190516_3-Scene-1-P21-B03.czi,annotate,MYL2,MYL7,MEIS2
+/allen/aics/microscopy/Data/RnD_Sandbox/5500000035/ZSD3/40X_zstack/5500000035_40X_20190516_3-Scene-2-P22-B03.czi,annotate,MYL2,MYL7,MEIS2
