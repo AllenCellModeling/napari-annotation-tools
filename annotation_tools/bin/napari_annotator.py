@@ -76,8 +76,8 @@ missing_keys = utils.check_keys(
     error_message="The following fields are missing from the data_csv: {}",
 )
 
-# else:
-if platform == "darwin":
+
+if platform == "darwin":  # macos
     image_paths = np.array(
         [file_path.replace("/allen/", "/Volumes/") for file_path in df.file_path]
     )
