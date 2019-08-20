@@ -19,6 +19,8 @@ import json
 from sys import platform
 import napari
 import napari.layers.labels._constants as layer_constants
+import tqdm
+import shutil
 
 from annotation_tools import image_loaders
 from annotation_tools import utils
@@ -46,6 +48,7 @@ missing_keys = utils.check_keys(
         [
             "annotator",
             "data_csv",
+            "data_dir_local",
             "save_dir",
             "start_from_last_annotation",
             "save_if_empty",
@@ -79,6 +82,39 @@ missing_keys = utils.check_keys(
     error_message="The following fields are missing from the data_csv: {}",
 )
 
+if platform == "darwin":
+    operating_system = "mac"
+elif platform == "linux" or platform == "linux2":
+    operating_system = "linux"
+else:
+    raise TypeError("mac and linux are only allowed operating systems")
+
+
+data_dir_local = args["data_dir_local"]
+
+# if we have a local data dir, then update the image paths to reflect that
+if data_dir_local is not None:
+    if not os.path.exists(data_dir_local):
+        os.makedirs(data_dir_local)
+
+    image_paths = np.array(
+        [
+            "{}/{}".format(data_dir_local, os.path.basename(file_path))
+            for file_path in df.file_path
+        ]
+    )
+
+    # verify all image paths are local
+    for i in tqdm.tqdm(range(len(df.file_path))):
+        if not os.path.exists(image_paths[i]):
+            if operating_system == "mac":
+                shutil.copyfile(
+                    df.file_path[i].replace("/allen/", "/Volumes/"), image_paths[i]
+                )
+            elif operating_system == "linux":
+                shutil.copyfile(df.file_path[i], image_paths[i])
+
+
 # Check the os and modify the paths accordingly
 if platform == "darwin":  # macos
     image_paths = np.array(
@@ -86,8 +122,7 @@ if platform == "darwin":  # macos
     )
 elif platform == "linux" or platform == "linux2":
     image_paths = np.array([file_path for file_path in df.file_path])
-else:
-    raise TypeError("mac and linux are only allowed operating systems")
+
 
 ref_files = image_paths[df.set == "reference"]
 annotate_files = image_paths[df.set == "annotate"]
