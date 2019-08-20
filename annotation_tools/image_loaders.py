@@ -20,11 +20,6 @@ def get_default_range(image, mode):
 
 def assay_dev_images(viewer, im_path, im_labels_path):
     img = aicsimageio.AICSImage(im_path)
-
-    import pdb
-
-    pdb.set_trace()
-
     cells = img.data[0]
 
     print("image shape: {}".format(cells.shape))
