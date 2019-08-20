@@ -15,9 +15,8 @@ from os.path import isfile
 import warnings
 import argparse
 import pandas as pd
-import shutil
-import tqdm
 import json
+from sys import platform
 
 import napari
 
@@ -47,11 +46,9 @@ missing_keys = utils.check_keys(
         [
             "annotator",
             "data_csv",
-            "data_dir_local",
             "save_dir",
             "start_from_last_annotation",
             "save_if_empty",
-            "os",
             "im_loader",
         ]
     ),
@@ -79,15 +76,12 @@ missing_keys = utils.check_keys(
     error_message="The following fields are missing from the data_csv: {}",
 )
 
-data_dir_local = args["data_dir_local"]
-operating_system = args["os"]
-
 # else:
-if operating_system == "mac":
+if platform == "darwin":
     image_paths = np.array(
         [file_path.replace("/allen/", "/Volumes/") for file_path in df.file_path]
     )
-elif operating_system == "linux":
+elif platform == "linux" or platform == "linux2":
     image_paths = np.array([file_path for file_path in df.file_path])
 else:
     raise TypeError("mac and linux are only allowed operating systems")
