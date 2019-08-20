@@ -1,8 +1,0 @@
-{
-	"annotator": "test",
-	"data_csv": "./data/image_test.csv",
-	"data_dir_local": "./data/image_test/images",
-	"save_dir": "./data/image_test/annotations",
-	"start_from_last_annotation": 1,
-	"save_if_empty": 0
-}

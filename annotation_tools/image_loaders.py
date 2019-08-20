@@ -19,8 +19,8 @@ def get_default_range(image, mode):
 
 
 def assay_dev_images(viewer, im_path, im_labels_path):
-    img = aicsimageio.omeTifReader.OmeTifReader(im_path)
-    cells = img.load()[0]
+    img = aicsimageio.AICSImage(im_path)
+    cells = img.data[0]
 
     print("image shape: {}".format(cells.shape))
 
@@ -49,7 +49,7 @@ def assay_dev_images(viewer, im_path, im_labels_path):
             ch = viewer.add_image(channel, name=ch_name)
         else:
             ch = viewer.layers[ch_name]
-            ch.image = channel
+            ch.data = channel
 
         ch.colormap = Colormap([(0, 0, 0, 1), ch_color])
         ch.clim = get_default_range(channel, ch_type)
@@ -97,7 +97,7 @@ def assay_dev_images_downsampled(viewer, im_path, im_labels_path):
     ]:  # skipping 4th channel which is a duplicate  brightfield channel
         print(i)
         img = aicsimageio.AICSImage(base_image_name + "C" + str(i) + ".tif")
-        cells = img.data[0]
+        cells = img.data[0][0]
 
         print("image shape: {}".format(cells.shape))
 
@@ -115,7 +115,7 @@ def assay_dev_images_downsampled(viewer, im_path, im_labels_path):
             ch = viewer.add_image(channel, name=ch_name)
         else:
             ch = viewer.layers[ch_name]
-            ch.image = channel
+            ch.data = channel
 
         ch.colormap = Colormap([(0, 0, 0, 1), ch_color])
         ch.clim = get_default_range(channel, ch_type)
@@ -131,7 +131,7 @@ def assay_dev_images_downsampled(viewer, im_path, im_labels_path):
 
 def microscopy_czi(viewer, im_path, im_labels_path):
     img = aicsimageio.AICSImage(im_path)
-    cells = img.data[0]
+    cells = img.data[0][0]
 
     print("image shape: {}".format(cells.shape))
 
@@ -160,7 +160,7 @@ def microscopy_czi(viewer, im_path, im_labels_path):
             ch = viewer.add_image(channel, name=ch_name)
         else:
             ch = viewer.layers[ch_name]
-            ch.image = channel
+            ch.data = channel
 
         ch.colormap = Colormap([(0, 0, 0, 1), ch_color])
         ch.clim = get_default_range(channel, ch_type)

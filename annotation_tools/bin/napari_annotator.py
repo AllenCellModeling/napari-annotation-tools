@@ -15,69 +15,33 @@ from os.path import isfile
 import warnings
 import argparse
 import pandas as pd
-import shutil
-import tqdm
 import json
-
+from sys import platform
 import napari
-
-# from napari.util import app_context
 import napari.layers.labels._constants as layer_constants
+import tqdm
+import shutil
 
 from annotation_tools import image_loaders
 from annotation_tools import utils
 
-
-# def str2bool(v):
-#     if v.lower() in ("yes", "true", "t", "y", "1"):
-#         return True
-#     elif v.lower() in ("no", "false", "f", "n", "0"):
-#         return False
-#     else:
-#         raise argparse.ArgumentTypeError("Boolean value expected.")
-
-
-# def save_load_dict(args, save_path):
-#     # saves a dictionary, 'args', as a json file. Or loads if it exists.
-
-#     if os.path.exists(save_path):
-#         warnings.warn(
-#             "Preference file exists at {}. Using existing args file.".format(save_path)
-#         )
-
-#         # load file
-#         with open(save_path, "rb") as f:
-#             args = json.load(f)
-#     else:
-
-#         with open(save_path, "w") as f:
-#             json.dump(args, f, indent=4, sort_keys=True)
-
-#     return args
-
-
-# def check_keys(args, required_keys, error_message):
-#     missing_keys = [key not in args for key in required_keys]
-
-#     if np.any(missing_keys):
-#         raise KeyError(error_message.format(required_keys[missing_keys]))
-
-#     return missing_keys
-
+skimage_save_warning = "'%s is a low contrast image' % fname"
+with warnings.catch_warnings():
+    warnings.filterwarnings(
+        "ignore", category=UserWarning, message=skimage_save_warning
+    )
 
 parser = argparse.ArgumentParser(description="Annotator for GE/SCE")
-
 parser.add_argument(
     "--prefs_path", type=str, default="./data/experiment.json", help="Experiment file"
 )
-
 args = parser.parse_args()
 print(args)
 
 with open(args.prefs_path, "rb") as f:
     args = json.load(f)
 
-
+# Check the keys in the json file
 missing_keys = utils.check_keys(
     args,
     required_keys=np.array(
@@ -88,7 +52,6 @@ missing_keys = utils.check_keys(
             "save_dir",
             "start_from_last_annotation",
             "save_if_empty",
-            "os",
             "im_loader",
         ]
     ),
@@ -98,61 +61,67 @@ missing_keys = utils.check_keys(
 start_from_last_annotation = args["start_from_last_annotation"]
 save_if_empty = args["save_if_empty"]
 
+# Make a save directory if one does not exist
 save_dir = args["save_dir"]
 if not os.path.exists(save_dir):
     os.makedirs(save_dir)
 
+# Get the image loader function
 im_loader = getattr(image_loaders, args["im_loader"])
 
-
+# Get the experiment file if one already exists
 args = utils.save_load_dict(args, "{}/experiment.json".format(args["save_dir"]))
 
-
+# Read the list of data
 df = pd.read_csv(args["data_csv"])
 
+# Verify data
 missing_keys = utils.check_keys(
     df,
     required_keys=np.array(["file_path", "set"]),
     error_message="The following fields are missing from the data_csv: {}",
 )
 
+if platform == "darwin":
+    operating_system = "mac"
+elif platform == "linux" or platform == "linux2":
+    operating_system = "linux"
+else:
+    raise TypeError("mac and linux are only allowed operating systems")
+
+
 data_dir_local = args["data_dir_local"]
-operating_system = args["os"]
+
+# if we have a local data dir, then update the image paths to reflect that
+if data_dir_local is not None:
+    if not os.path.exists(data_dir_local):
+        os.makedirs(data_dir_local)
+
+    image_paths = np.array(
+        [
+            "{}/{}".format(data_dir_local, os.path.basename(file_path))
+            for file_path in df.file_path
+        ]
+    )
+
+    # verify all image paths are local
+    for i in tqdm.tqdm(range(len(df.file_path))):
+        if not os.path.exists(image_paths[i]):
+            if operating_system == "mac":
+                shutil.copyfile(
+                    df.file_path[i].replace("/allen/", "/Volumes/"), image_paths[i]
+                )
+            elif operating_system == "linux":
+                shutil.copyfile(df.file_path[i], image_paths[i])
 
 
-# if data_dir_local is not None:
-#     if not os.path.exists(data_dir_local):
-#         os.makedirs(data_dir_local)
-
-#     image_paths = np.array(
-#         [
-#             "{}/{}".format(data_dir_local, os.path.basename(file_path))
-#             for file_path in df.file_path
-#         ]
-#     )
-
-#     for i in tqdm.tqdm(range(len(df.file_path))):
-
-#         if not os.path.exists(image_paths[i]):
-#             if operating_system == "mac":
-#                 shutil.copyfile(
-#                     df.file_path[i].replace("/allen/", "/Volumes/"), image_paths[i]
-#                 )
-#             elif operating_system == "linux":
-#                 shutil.copyfile(df.file_path[i], image_paths[i])
-#             else:
-#                 raise TypeError("mac and linux are only allowed operating systems")
-
-
-# else:
-if operating_system == "mac":
+# Check the os and modify the paths accordingly
+if platform == "darwin":  # macos
     image_paths = np.array(
         [file_path.replace("/allen/", "/Volumes/") for file_path in df.file_path]
     )
-elif operating_system == "linux":
+elif platform == "linux" or platform == "linux2":
     image_paths = np.array([file_path for file_path in df.file_path])
-else:
-    raise TypeError("mac and linux are only allowed operating systems")
 
 
 ref_files = image_paths[df.set == "reference"]
@@ -166,6 +135,7 @@ annotation_paths = [
     for image_path in image_paths
 ]
 
+# Set the image index of where we last let off
 if not start_from_last_annotation:
     curr_index = 0
 else:
@@ -177,15 +147,7 @@ else:
     else:
         curr_index = np.where(missing_files)[0][0]
 
-
-skimage_save_warning = "'%s is a low contrast image' % fname"
-
-with warnings.catch_warnings():
-    warnings.filterwarnings(
-        "ignore", category=UserWarning, message=skimage_save_warning
-    )
-
-
+# Some useful functions for tracking the index of the current image
 def get_max_index():
     return len(image_paths)
 
@@ -311,7 +273,7 @@ with napari.gui_qt():
             )
         else:
             annotations_layer = viewer.layers["annotations"]
-            annotations_layer.image = labels
+            annotations_layer.data = labels
 
         annotations_layer.n_dimensional = False
 
