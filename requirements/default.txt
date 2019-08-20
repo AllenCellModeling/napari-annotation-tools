@@ -3,6 +3,6 @@ numpy>=1.10.0
 scipy>=1.2.0
 scikit-image
 pandas
-aicsimageio
+aicsimageio=3.0.0
 natsort
 tqdm
