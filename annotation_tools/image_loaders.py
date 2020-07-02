@@ -1,9 +1,12 @@
+#!/usr/bin/env python
+
+
 import numpy as np
 from skimage.io import imread
 import os
 
 from vispy.color import Colormap
-import aicsimageio
+from aicsimageio import AICSImage
 
 
 def get_default_range(image, mode):
@@ -96,9 +99,11 @@ def assay_dev_images_downsampled(viewer, im_path, im_labels_path):
         5,
     ]:  # skipping 4th channel which is a duplicate  brightfield channel
         print(i)
-        img = aicsimageio.AICSImage(base_image_name + "C" + str(i) + ".tif")
-        cells = img.data[0][0]
-
+        image_file = base_image_name + "C" + str(i) + ".tif"
+        ReaderClass = AICSImage.determine_reader(image_file)
+        img = ReaderClass(image_file)
+        cells = img.data
+        
         print("image shape: {}".format(cells.shape))
 
         ch_num = i
@@ -125,7 +130,7 @@ def assay_dev_images_downsampled(viewer, im_path, im_labels_path):
         if os.path.exists(im_labels_path):
             labels = imread(im_labels_path)
         else:
-            labels = np.zeros(cells[0, 0, :, :].shape, dtype=np.int)
+            labels = np.zeros(cells[0, :, :].shape, dtype=np.int)
     return (viewer, layer_names, labels)
 
 
