@@ -14,7 +14,7 @@ setuptools.setup(
     url="https://github.com/AllenCellModeling/napari-annotation-tools",
     version="0.2",
     install_requires=[
-        "napari[pyqt5]>=0.3.0"
+        "napari[pyqt5]>=0.3.0",
         "napari-aicsimageio>=0.1.3",
         "numpy>=1.17.2",
         "scipy>=1.2.0",

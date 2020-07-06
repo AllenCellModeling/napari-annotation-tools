@@ -18,7 +18,7 @@ import pandas as pd
 import json
 from sys import platform
 import napari
-import napari.layers.labels._constants as layer_constants
+# import napari.layers.labels._constants as layer_constants
 import tqdm
 import shutil
 
@@ -115,13 +115,14 @@ if data_dir_local is not None:
                 shutil.copyfile(df.file_path[i], image_paths[i])
 
 
-# Check the os and modify the paths accordingly
-if platform == "darwin":  # macos
-    image_paths = np.array(
-        [file_path.replace("/allen/", "/Volumes/") for file_path in df.file_path]
-    )
-elif platform == "linux" or platform == "linux2":
-    image_paths = np.array([file_path for file_path in df.file_path])
+else:
+    # Check the os and modify the paths accordingly
+    if platform == "darwin":  # macos
+        image_paths = np.array(
+            [file_path.replace("/allen/", "/Volumes/") for file_path in df.file_path]
+        )
+    elif platform == "linux" or platform == "linux2":
+        image_paths = np.array([file_path for file_path in df.file_path])
 
 
 ref_files = image_paths[df.set == "reference"]
@@ -169,7 +170,7 @@ def set_index(index):
 
 with napari.gui_qt():
     # create an empty viewer
-    viewer = napari.view()
+    viewer = napari.Viewer()
 
     @viewer.bind_key("s")
     def save(viewer, layer_name="annotations"):
@@ -277,9 +278,9 @@ with napari.gui_qt():
 
         annotations_layer.n_dimensional = False
 
-        if annotations_layer.mode == layer_constants.Mode.FILL:
-            annotations_layer.mode = layer_constants.Mode.PAINT
-            viewer.status = "Switched to paint mode for your safety."
+#         if annotations_layer.mode == layer_constants.Mode.FILL:
+#             annotations_layer.mode = layer_constants.Mode.PAINT
+#             viewer.status = "Switched to paint mode for your safety."
 
         max_label(viewer)
 
