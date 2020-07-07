@@ -127,7 +127,7 @@ else:
 
 ref_files = image_paths[df.set == "reference"]
 annotate_files = image_paths[df.set == "annotate"]
-np.random.shuffle(annotate_files)
+# np.random.shuffle(annotate_files)
 
 image_paths = np.concatenate([ref_files, annotate_files])
 
@@ -278,9 +278,9 @@ with napari.gui_qt():
 
         annotations_layer.n_dimensional = False
 
-#         if annotations_layer.mode == layer_constants.Mode.FILL:
-#             annotations_layer.mode = layer_constants.Mode.PAINT
-#             viewer.status = "Switched to paint mode for your safety."
+        if annotations_layer.mode == "fill":
+            annotations_layer.mode = "paint"
+            viewer.status = "Switched to paint mode for your safety."
 
         max_label(viewer)
 
