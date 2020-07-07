@@ -123,7 +123,7 @@ def assay_dev_images_downsampled(viewer, im_path, im_labels_path):
             ch.data = channel
 
         ch.colormap = Colormap([(0, 0, 0, 1), ch_color])
-        ch.clim = get_default_range(channel, ch_type)
+        ch.contrast_limits = get_default_range(channel, ch_type)
         ch.blending = "additive"
 
         # for this case, annotations are only 2D
