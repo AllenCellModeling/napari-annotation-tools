@@ -218,36 +218,6 @@ with napari.gui_qt():
         print(msg)
         viewer.status = msg
 
-    @viewer.bind_key("r")
-    def revert(viewer, layer_name="annotations"):
-        """Loads the last saved annotation
-        """
-        if isfile(annotation_paths[curr_index]):
-            labels = imread(annotation_paths[curr_index])
-        else:
-            labels = np.zeros(viewer.layers[layer_name].data.shape, dtype=np.int)
-
-        viewer.layers[layer_name].data = labels
-
-        msg = "Reverting " + viewer.layers[layer_name].name
-        print(msg)
-        # viewer.status = msg
-
-    @viewer.bind_key("i")
-    def increment_label(viewer, layer_name="annotations"):
-        """Increments current label
-        """
-        label = viewer.layers[layer_name].selected_label
-        viewer.layers[layer_name].selected_label = label + 1
-
-    @viewer.bind_key("d")
-    def decrement_label(viewer, layer_name="annotations"):
-        """Decrements current label
-        """
-        label = viewer.layers[layer_name].selected_label
-        if label > 0:
-            viewer.layers[layer_name].selected_label = label - 1
-
     @viewer.bind_key("t")
     def background_label(viewer, layer_name="annotations"):
         """Set current label to background
