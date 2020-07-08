@@ -127,7 +127,7 @@ else:
 
 ref_files = image_paths[df.set == "reference"]
 annotate_files = image_paths[df.set == "annotate"]
-# np.random.shuffle(annotate_files)
+np.random.shuffle(annotate_files)
 
 image_paths = np.concatenate([ref_files, annotate_files])
 
@@ -228,7 +228,7 @@ with napari.gui_qt():
     def max_label(viewer, layer_name="annotations"):
         """Sets label to max label in visible slice
         """
-        label = viewer.layers[layer_name]._data_view.max()
+        label = viewer.layers[layer_name].data.max()
         viewer.layers[layer_name].selected_label = label + 1
 
     def load_image(viewer, im_path, im_labels_path):
