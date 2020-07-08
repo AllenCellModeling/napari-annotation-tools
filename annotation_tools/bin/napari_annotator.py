@@ -18,7 +18,7 @@ import pandas as pd
 import json
 from sys import platform
 import napari
-import napari.layers.labels._constants as layer_constants
+# import napari.layers.labels._constants as layer_constants
 import tqdm
 import shutil
 
@@ -115,13 +115,14 @@ if data_dir_local is not None:
                 shutil.copyfile(df.file_path[i], image_paths[i])
 
 
-# Check the os and modify the paths accordingly
-if platform == "darwin":  # macos
-    image_paths = np.array(
-        [file_path.replace("/allen/", "/Volumes/") for file_path in df.file_path]
-    )
-elif platform == "linux" or platform == "linux2":
-    image_paths = np.array([file_path for file_path in df.file_path])
+else:
+    # Check the os and modify the paths accordingly
+    if platform == "darwin":  # macos
+        image_paths = np.array(
+            [file_path.replace("/allen/", "/Volumes/") for file_path in df.file_path]
+        )
+    elif platform == "linux" or platform == "linux2":
+        image_paths = np.array([file_path for file_path in df.file_path])
 
 
 ref_files = image_paths[df.set == "reference"]
@@ -169,7 +170,7 @@ def set_index(index):
 
 with napari.gui_qt():
     # create an empty viewer
-    viewer = napari.view()
+    viewer = napari.Viewer()
 
     @viewer.bind_key("s")
     def save(viewer, layer_name="annotations"):
@@ -217,36 +218,6 @@ with napari.gui_qt():
         print(msg)
         viewer.status = msg
 
-    @viewer.bind_key("r")
-    def revert(viewer, layer_name="annotations"):
-        """Loads the last saved annotation
-        """
-        if isfile(annotation_paths[curr_index]):
-            labels = imread(annotation_paths[curr_index])
-        else:
-            labels = np.zeros(viewer.layers[layer_name].data.shape, dtype=np.int)
-
-        viewer.layers[layer_name].data = labels
-
-        msg = "Reverting " + viewer.layers[layer_name].name
-        print(msg)
-        # viewer.status = msg
-
-    @viewer.bind_key("i")
-    def increment_label(viewer, layer_name="annotations"):
-        """Increments current label
-        """
-        label = viewer.layers[layer_name].selected_label
-        viewer.layers[layer_name].selected_label = label + 1
-
-    @viewer.bind_key("d")
-    def decrement_label(viewer, layer_name="annotations"):
-        """Decrements current label
-        """
-        label = viewer.layers[layer_name].selected_label
-        if label > 0:
-            viewer.layers[layer_name].selected_label = label - 1
-
     @viewer.bind_key("t")
     def background_label(viewer, layer_name="annotations"):
         """Set current label to background
@@ -257,7 +228,7 @@ with napari.gui_qt():
     def max_label(viewer, layer_name="annotations"):
         """Sets label to max label in visible slice
         """
-        label = viewer.layers[layer_name]._data_view.max()
+        label = viewer.layers[layer_name].data.max()
         viewer.layers[layer_name].selected_label = label + 1
 
     def load_image(viewer, im_path, im_labels_path):
@@ -277,8 +248,8 @@ with napari.gui_qt():
 
         annotations_layer.n_dimensional = False
 
-        if annotations_layer.mode == layer_constants.Mode.FILL:
-            annotations_layer.mode = layer_constants.Mode.PAINT
+        if annotations_layer.mode == "fill":
+            annotations_layer.mode = "paint"
             viewer.status = "Switched to paint mode for your safety."
 
         max_label(viewer)

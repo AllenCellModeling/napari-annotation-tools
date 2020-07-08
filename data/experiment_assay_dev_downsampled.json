@@ -1,9 +1,0 @@
-{
-	"annotator": "test",
-	"data_csv": "./data/napari_images_assay_dev_downsampled.csv",
-	"data_dir_local": null,
-	"save_dir": "./data/annotations_assay_dev_downsampled",
-	"start_from_last_annotation": 1,
-	"save_if_empty": 0,
-    "im_loader": "assay_dev_images_downsampled"
-}
