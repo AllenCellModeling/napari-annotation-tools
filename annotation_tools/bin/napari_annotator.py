@@ -127,7 +127,7 @@ else:
 
 ref_files = image_paths[df.set == "reference"]
 annotate_files = image_paths[df.set == "annotate"]
-np.random.shuffle(annotate_files)
+# np.random.shuffle(annotate_files)
 
 image_paths = np.concatenate([ref_files, annotate_files])
 
