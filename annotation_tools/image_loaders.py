@@ -22,7 +22,7 @@ def get_default_range(image, mode):
 
 
 def assay_dev_images(viewer, im_path, im_labels_path):
-    img = aicsimageio.AICSImage(im_path)
+    img = AICSImage(im_path)
     cells = img.data[0]
 
     print("image shape: {}".format(cells.shape))
@@ -135,7 +135,7 @@ def assay_dev_images_downsampled(viewer, im_path, im_labels_path):
 
 
 def microscopy_czi(viewer, im_path, im_labels_path):
-    img = aicsimageio.AICSImage(im_path)
+    img = AICSImage(im_path)
     cells = img.data[0][0]
 
     print("image shape: {}".format(cells.shape))
